@@ -26,6 +26,30 @@ def login():
             return redirect(url_for('login'))  # กลับไปหน้า login
     return render_template('login.html', form=form)
 
+@app.route('/signup', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        # ดึงข้อมูลจากฟอร์ม
+        username = form.username.data
+        password = form.password.data
+
+        # ตรวจสอบว่ามีชื่อผู้ใช้นี้ในระบบหรือยัง
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash('ชื่อผู้ใช้นี้ถูกใช้แล้ว กรุณาเลือกชื่อใหม่', 'danger')
+            return redirect(url_for('signup'))
+
+        # สร้างผู้ใช้ใหม่
+        new_user = User(username=username, password=password)  
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('สมัครสมาชิกสำเร็จ! กรุณาล็อกอิน', 'success')
+        return redirect(url_for('login'))  
+
+    return render_template('signup.html', form=form)  # หรือใช้ signup.html ได้
+
 
 if __name__ == '__main__':
     app.run(debug=True)
