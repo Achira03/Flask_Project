@@ -1,10 +1,28 @@
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_migrate import Migrate
 from forms import LoginForm, ReportForm, RegisterForm  
 from models import db, User, Report
 
 app = Flask(__name__)
+app.config.from_object('config.Config')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///D:/Aj.bot/Flask_project/database.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'your_secret_key'
+
+
+db.init_app(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+migrate = Migrate(app, db)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))  # ใช้ db.session.get() แทน query.get()
 
 @app.route('/')
 def index():
@@ -18,7 +36,7 @@ def login():
         password = form.password.data
         user = User.query.filter_by(username=username).first()  # ค้นหาผู้ใช้จากฐานข้อมูล
         
-        if user and user.password == password:  # ตรวจสอบว่า username และ password ถูกต้อง
+        if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('dashboard'))  # ถ้าล็อกอินสำเร็จไปหน้า dashboard
         else:
@@ -41,7 +59,8 @@ def register():
             return redirect(url_for('signup'))
 
         # สร้างผู้ใช้ใหม่
-        new_user = User(username=username, password=password)  
+        hashed_password = generate_password_hash(password)
+        new_user = User(username=username, password=hashed_password,)  
         db.session.add(new_user)
         db.session.commit()
 
@@ -51,5 +70,19 @@ def register():
     return render_template('signup.html', form=form)  # หรือใช้ signup.html ได้
 
 
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    if current_user.role == 'admin':  # ถ้าเป็นแอดมินให้เห็นทุกปัญหา
+        reports = Report.query.all()
+    else:
+        reports = Report.query.filter_by(user_id=current_user.id).all()  # ดึงเฉพาะของผู้ใช้เอง
+    return render_template('dashboard.html', reports=reports)
+
+
+
+
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
