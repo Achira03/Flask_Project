@@ -128,6 +128,17 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <!-- เสร็จสิ้น -->
+                    <a href="{{ url_for('issues_by_status', status='completed') }}" class="text-white text-decoration-none">
+                        <h5 class="card-title"><i class="fas fa-check-circle"></i> เสร็จสิ้น</h5>
+                    </a>
+                    <p class="card-text fs-3">{{ completed_reports }}</p>
+                </div>
+            </div>
+        </div>
     </div>
 
         <!-- Table for Latest Reports -->
