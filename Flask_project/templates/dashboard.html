@@ -104,6 +104,20 @@
             <i class="fas fa-exclamation-circle"></i> ดูรายการปัญหาทั้งหมด
         </a>
 
+    <!-- Cards Summary -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <!-- ปัญหาทั้งหมด -->
+                    <a href="{{ url_for('issues') }}" class="text-white text-decoration-none">
+                        <h5 class="card-title"><i class="fas fa-list"></i> ปัญหาทั้งหมด</h5>
+                    </a>
+                    <p class="card-text fs-3">{{ total_reports }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
         <!-- Table for Latest Reports -->
         <div class="card">
