@@ -1,9 +1,13 @@
+import os
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_migrate import Migrate
 from forms import LoginForm, ReportForm, RegisterForm  
 from models import db, User, Report
+from werkzeug.security import check_password_hash, generate_password_hash
+from utils import admin_required, moderator_required
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
@@ -69,6 +73,36 @@ def register():
 
     return render_template('signup.html', form=form)  # หรือใช้ signup.html ได้
 
+@app.route('/report', methods=['GET', 'POST'])
+@login_required
+def report():
+    form = ReportForm()
+    if form.validate_on_submit():
+        file_path = None
+        if form.file.data:
+            filename = secure_filename(form.file.data.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            form.file.data.save(file_path)
+
+        new_report = Report(
+            title=form.title.data,
+            description=form.description.data,
+            category=form.category.data,
+            file=file_path,
+            contact=form.contact.data,
+            user_id=current_user.id
+        )
+        db.session.add(new_report)
+        db.session.commit()
+        flash('ส่งเรื่องเรียบร้อยแล้ว!', 'success')
+        return redirect(url_for('index'))
+    return render_template('report.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route('/dashboard')
 @login_required
