@@ -42,6 +42,11 @@
                 <label for="file" class="form-label">📎 แนบไฟล์หรือรูปภาพ (ถ้ามี):</label>
                 {{ form.file(class="form-control") }}
             </div>
+
+            <div class="mb-3">
+                <label for="contact" class="form-label">📞 ข้อมูลติดต่อเพิ่มเติม (ถ้าจำเป็น):</label>
+                {{ form.contact(class="form-control", placeholder="เช่น อีเมล หรือเบอร์โทร") }}
+            </div>
         </form>
     </div>
 
