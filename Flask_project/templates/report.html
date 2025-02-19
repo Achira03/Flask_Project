@@ -32,6 +32,11 @@
                 <label for="description" class="form-label">📝 รายละเอียดปัญหา:</label>
                 {{ form.description(class="form-control", rows=4, placeholder="อธิบายปัญหา") }}
             </div>
+
+            <div class="mb-3">
+                <label for="category" class="form-label">📂 หมวดหมู่:</label>
+                {{ form.category(class="form-control", placeholder = "หมวดหมู่ปัญหา") }}
+            </div>
         </form>
     </div>
 
