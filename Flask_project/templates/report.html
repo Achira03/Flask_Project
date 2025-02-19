@@ -19,6 +19,16 @@
             {% endif %}
         {% endwith %}
 
+        <!-- ฟอร์มแจ้งปัญหา -->
+        <form action="{{ url_for('report') }}" method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+                <label for="title" class="form-label">🔹 ชื่อเรื่อง:</label>
+                {{ form.title(class="form-control", placeholder="กรอกชื่อเรื่อง") }}
+            </div>
+
+        </form>
     </div>
 
     <hr>
