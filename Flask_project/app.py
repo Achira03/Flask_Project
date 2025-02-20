@@ -113,6 +113,21 @@ def dashboard():
         reports = Report.query.filter_by(user_id=current_user.id).all()  # ดึงเฉพาะของผู้ใช้เอง
     return render_template('dashboard.html', reports=reports)
 
+@app.route('/issues')
+def issues():
+    reports = Report.query.order_by(Report.created_at.desc()).all()  # ดึงข้อมูลเรียงตามวันที่ล่าสุด
+    return render_template('issues.html', reports=reports)
+
+@app.route('/issues/status/<status>')
+@login_required
+def issues_by_status(status):
+    if status == 'in_progress':
+        reports = Report.query.filter_by(status='in_progress').all()
+    elif status == 'completed':
+        reports = Report.query.filter_by(status='completed').all()
+    else:
+        reports = Report.query.all()  # กรณีสถานะไม่ถูกกำหนด
+    return render_template('issues.html', reports=reports)
 
 
 
