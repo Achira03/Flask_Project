@@ -119,17 +119,30 @@ def issues():
     return render_template('issues.html', reports=reports)
 
 @app.route('/issues/status/<status>')
-@login_required
 def issues_by_status(status):
-    if status == 'in_progress':
-        reports = Report.query.filter_by(status='in_progress').all()
-    elif status == 'completed':
-        reports = Report.query.filter_by(status='completed').all()
+    # Query to get reports filtered by status
+    reports = Report.query.filter_by(status=status).all()
+    return render_template('issues.html', reports=reports, status=status)
+
+@app.route('/admin', methods=['GET', 'POST'])
+@login_required  # ต้องล็อกอินก่อนเข้า
+@admin_required  # ต้องเป็นแอดมินเท่านั้น
+def admin_dashboard():
+    users = User.query.all()  # ดึงรายชื่อผู้ใช้ทั้งหมด
+    category_filter = request.args.get('category')  # ดึงหมวดหมู่ที่เลือกจาก URL
+
+    # ดึงรายงานจากฐานข้อมูลตามหมวดหมู่ที่กรอง
+    if category_filter:
+        reports = Report.query.filter_by(category=category_filter).all()
     else:
-        reports = Report.query.all()  # กรณีสถานะไม่ถูกกำหนด
-    return render_template('issues.html', reports=reports)
+        reports = Report.query.all()  # ดึงปัญหาทั้งหมดหากไม่มีการกรอง
+
+    return render_template('admin.html', users=users, reports=reports)
 
 
+    users = User.query.all()  # ดึงข้อมูลผู้ใช้ทั้งหมด
+
+    return render_template('admin.html', reports=reports, users=users)
 
 if __name__ == '__main__':
     with app.app_context():
