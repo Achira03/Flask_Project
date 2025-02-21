@@ -151,6 +151,17 @@ def change_role(user_id):
         flash(f'เปลี่ยน Role ของ {user.username} เป็น {new_role} สำเร็จ!', 'success')
     return redirect(url_for('admin_dashboard'))
 
+@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+        flash(f'ลบผู้ใช้ {user.username} สำเร็จ!', 'success')
+    return redirect(url_for('admin_dashboard'))
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
