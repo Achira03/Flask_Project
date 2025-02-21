@@ -35,7 +35,7 @@
 
             <div class="mb-3">
                 <label for="category" class="form-label">📂 หมวดหมู่:</label>
-                {{ form.category(class="form-control", placeholder = "หมวดหมู่ปัญหา") }}
+                {{ form.category(class="form-control", placeholder="หมวดหมู่ปัญหา") }}
             </div>
 
             <div class="mb-3">
@@ -64,9 +64,64 @@
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <strong>{{ report.title }}</strong>
                 <span class="badge bg-warning text-dark">{{ report.status }}</span>
+                <span class="badge bg-secondary">{{ report.category }}</span> <!-- แสดงหมวดหมู่ -->
             </li>
         {% endfor %}
     </ul>
+</div>
+
+<hr>
+
+<!-- Card for Report Management -->
+<div class="card shadow-lg border-0 rounded-4 mb-4">
+    <div class="card-header bg-success text-white text-center rounded-4">
+        <h3 class="font-weight-bold">จัดการปัญหา</h3>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>หัวข้อ</th>
+                    <th>หมวดหมู่</th>
+                    <th>สถานะ</th>
+                    <th>เปลี่ยนสถานะ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                <tr>
+                    <td>{{ report.id }}</td>
+                    <td>{{ report.title }}</td>
+                    <td>
+                        <span class="badge bg-secondary">{{ report.category }}</span> <!-- แสดงหมวดหมู่ -->
+                    </td>
+                    <td>
+                        {% if report.status == 'รอดำเนินการ' %}
+                        <span class="badge bg-warning text-dark">{{ report.status }}</span>
+                        {% elif report.status == 'กำลังดำเนินการ' %}
+                        <span class="badge bg-primary text-white">{{ report.status }}</span>
+                        {% else %}
+                        <span class="badge bg-success text-white">{{ report.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form action="{{ url_for('update_report_status', report_id=report.id) }}" method="post">
+                            <select class="form-select form-control-lg" name="status" aria-label="Select Status">
+                                <option value="รอดำเนินการ" {% if report.status == 'รอดำเนินการ' %}selected{% endif %}>รอดำเนินการ</option>
+                                <option value="กำลังดำเนินการ" {% if report.status == 'กำลังดำเนินการ' %}selected{% endif %}>กำลังดำเนินการ</option>
+                                <option value="เสร็จสิ้น" {% if report.status == 'เสร็จสิ้น' %}selected{% endif %}>เสร็จสิ้น</option>
+                            </select>
+                            <button class="btn btn-outline-info mt-3 w-100 shadow-md transition-all hover:bg-blue-200" type="submit">
+                                <i class="fas fa-sync-alt"></i> อัปเดตสถานะ
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% endblock %}
