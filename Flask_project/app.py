@@ -139,10 +139,17 @@ def admin_dashboard():
 
     return render_template('admin.html', users=users, reports=reports)
 
-
-    users = User.query.all()  # ดึงข้อมูลผู้ใช้ทั้งหมด
-
-    return render_template('admin.html', reports=reports, users=users)
+@app.route('/admin/change_role/<int:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def change_role(user_id):
+    user = User.query.get(user_id)
+    if user:
+        new_role = request.form.get('role')  # รับ role ใหม่จากฟอร์ม
+        user.role = new_role
+        db.session.commit()
+        flash(f'เปลี่ยน Role ของ {user.username} เป็น {new_role} สำเร็จ!', 'success')
+    return redirect(url_for('admin_dashboard'))
 
 if __name__ == '__main__':
     with app.app_context():
