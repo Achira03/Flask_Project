@@ -162,6 +162,30 @@ def delete_user(user_id):
         flash(f'ลบผู้ใช้ {user.username} สำเร็จ!', 'success')
     return redirect(url_for('admin_dashboard'))
 
+@app.route('/update_report_status/<int:report_id>', methods=['POST'])
+@login_required
+@admin_required  # หรือแอดมินเท่านั้นที่สามารถอัปเดตสถานะได้
+def update_report_status(report_id):
+    report = Report.query.get_or_404(report_id)  # ค้นหารายงานโดยใช้ report_id
+    if request.method == 'POST':
+        new_status = request.form.get('status')  # รับสถานะใหม่จากฟอร์ม
+        report.status = new_status
+        db.session.commit()  # บันทึกการเปลี่ยนแปลงในฐานข้อมูล
+        flash(f'สถานะของปัญหาหมายเลข {report.id} ถูกอัปเดตเป็น {new_status} แล้ว!', 'success')
+    return redirect(url_for('admin_dashboard'))  # กลับไปที่หน้า admin dashboard
+
+@app.route('/admin_dashboard_1', methods=['GET'])
+def admin_dashboard_1():
+    category_filter = request.args.get('category')
+    if category_filter:
+        reports = Report.query.filter_by(category=category_filter).all()
+    else:
+        reports = Report.query.all()
+
+    users = User.query.all()  # ดึงข้อมูลผู้ใช้ทั้งหมด
+
+    return render_template('admin.html', reports=reports, users=users)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
