@@ -97,9 +97,9 @@
                         <span class="badge bg-secondary">{{ report.category }}</span> <!-- แสดงหมวดหมู่ -->
                     </td>
                     <td>
-                        {% if report.status == 'รอดำเนินการ' %}
+                        {% if report.status.name == 'รอดำเนินการ' %}
                         <span class="badge bg-warning text-dark">{{ report.status }}</span>
-                        {% elif report.status == 'กำลังดำเนินการ' %}
+                        {% elif report.status.name == 'กำลังดำเนินการ' %}
                         <span class="badge bg-primary text-white">{{ report.status }}</span>
                         {% else %}
                         <span class="badge bg-success text-white">{{ report.status }}</span>
