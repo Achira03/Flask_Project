@@ -79,11 +79,12 @@
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                     <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> โปรไฟล์</a></li>
                     <li><hr class="dropdown-divider"></li>
+                    {% if current_user.role == 'admin' %}
+                    <li><a class="dropdown-item" href="{{ url_for('admin_dashboard') }}"><i class="fas fa-cogs"></i> จัดการแอดมิน</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    {% endif %}
                     <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a></li>
                 </ul>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('dashboard') }}">📋 Dashboard</a>
-                </li>
             </div>
         </div>
     </nav>
@@ -104,42 +105,42 @@
             <i class="fas fa-exclamation-circle"></i> ดูรายการปัญหาทั้งหมด
         </a>
 
-    <!-- Cards Summary -->
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card text-white bg-primary mb-3">
-                <div class="card-body">
-                    <!-- ปัญหาทั้งหมด -->
-                    <a href="{{ url_for('issues') }}" class="text-white text-decoration-none">
-                        <h5 class="card-title"><i class="fas fa-list"></i> ปัญหาทั้งหมด</h5>
-                    </a>
-                    <p class="card-text fs-3">{{ total_reports }}</p>
+        <!-- Cards Summary -->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body">
+                        <!-- ปัญหาทั้งหมด -->
+                        <a href="{{ url_for('issues') }}" class="text-white text-decoration-none">
+                            <h5 class="card-title"><i class="fas fa-list"></i> ปัญหาทั้งหมด</h5>
+                        </a>
+                        <p class="card-text fs-3">{{ total_reports }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-warning mb-3">
+                    <div class="card-body">
+                        <!-- กำลังดำเนินการ -->
+                        <a href="{{ url_for('issues_by_status', status='in_progress') }}" class="text-white text-decoration-none">
+                            <h5 class="card-title"><i class="fas fa-spinner"></i> กำลังดำเนินการ</h5>
+                        </a>
+                        <p class="card-text fs-3">{{ in_progress_reports }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body">
+                        <!-- เสร็จสิ้น -->
+                        <a href="{{ url_for('issues_by_status', status='completed') }}" class="text-white text-decoration-none">
+                            <h5 class="card-title"><i class="fas fa-check-circle"></i> เสร็จสิ้น</h5>
+                        </a>
+                        <p class="card-text fs-3">{{ completed_reports }}</p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-body">
-                    <!-- กำลังดำเนินการ -->
-                    <a href="{{ url_for('issues_by_status', status='in_progress') }}" class="text-white text-decoration-none">
-                        <h5 class="card-title"><i class="fas fa-spinner"></i> กำลังดำเนินการ</h5>
-                    </a>
-                    <p class="card-text fs-3">{{ in_progress_reports }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-body">
-                    <!-- เสร็จสิ้น -->
-                    <a href="{{ url_for('issues_by_status', status='completed') }}" class="text-white text-decoration-none">
-                        <h5 class="card-title"><i class="fas fa-check-circle"></i> เสร็จสิ้น</h5>
-                    </a>
-                    <p class="card-text fs-3">{{ completed_reports }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
         <!-- Table for Latest Reports -->
         <div class="card">
