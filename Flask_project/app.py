@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy, pagination
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_migrate import Migrate
 from forms import LoginForm, ReportForm, RegisterForm  
-from models import db, User, Report
+from models import db, User, Report, Status
 from werkzeug.security import check_password_hash, generate_password_hash
 from utils import admin_required, moderator_required
 from werkzeug.utils import secure_filename
@@ -174,13 +174,20 @@ def delete_user(user_id):
 @login_required
 @admin_required  # หรือแอดมินเท่านั้นที่สามารถอัปเดตสถานะได้
 def update_report_status(report_id):
-    report = Report.query.get_or_404(report_id)  # ค้นหารายงานโดยใช้ report_id
-    if request.method == 'POST':
-        new_status = request.form.get('status')  # รับสถานะใหม่จากฟอร์ม
-        report.status = new_status
-        db.session.commit()  # บันทึกการเปลี่ยนแปลงในฐานข้อมูล
+    report = Report.query.get_or_404(report_id)  # ค้นหารายงานจาก ID
+    new_status = request.form.get('status')  # รับค่าสถานะใหม่จากฟอร์ม
+
+    # ค้นหา status_id ที่ตรงกับชื่อ new_status
+    status_obj = Status.query.filter_by(name=new_status).first()
+
+    if status_obj:
+        report.status_id = status_obj.id  # ✅ อัปเดต status_id ไม่ใช่ report.status
+        db.session.commit()  # บันทึกการเปลี่ยนแปลง
         flash(f'สถานะของปัญหาหมายเลข {report.id} ถูกอัปเดตเป็น {new_status} แล้ว!', 'success')
-    return redirect(url_for('admin_dashboard'))  # กลับไปที่หน้า admin dashboard
+    else:
+        flash('ไม่พบสถานะที่เลือก กรุณาลองใหม่!', 'danger')
+
+    return redirect(url_for('admin_dashboard'))  # กลับไปที่หน้าแอดมิน
 
 @app.route('/admin_dashboard_1', methods=['GET'])
 def admin_dashboard_1():
