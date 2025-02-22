@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, redirect, url_for, flash, request
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, pagination
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_migrate import Migrate
 from forms import LoginForm, ReportForm, RegisterForm  
@@ -114,9 +114,17 @@ def dashboard():
     return render_template('dashboard.html', reports=reports)
 
 @app.route('/issues')
+@login_required
 def issues():
-    reports = Report.query.order_by(Report.created_at.desc()).all()  # ดึงข้อมูลเรียงตามวันที่ล่าสุด
-    return render_template('issues.html', reports=reports)
+    status_filter = request.args.get('status')  # รับสถานะจาก query string
+    page = request.args.get('page', 1, type=int)
+    
+    if status_filter == 'in_progress':
+        reports = Report.query.filter(Report.status=='กำลังดำเนินการ').paginate(page=page, per_page=10, error_out=False)
+    else:
+        reports = Report.query.paginate(page=page, per_page=10, error_out=False)
+    
+    return render_template('issues.html', reports=reports, status_filter=status_filter)
 
 @app.route('/issues/status/<status>')
 def issues_by_status(status):
