@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายการปัญหา</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>รายการปัญหาภายในคณะ</h2>
+        
+        <!-- ปุ่มกรองสถานะ "กำลังดำเนินการ" -->
+        <a href="{{ url_for('issues', status='in_progress') }}" class="btn btn-primary">กำลังดำเนินการ</a>
+        
+        <!-- ปุ่มกรองสถานะทั้งหมด -->
+        <a href="{{ url_for('issues') }}" class="btn btn-secondary">ปัญหาทั้งหมด</a>
+
+        <h3 class="mt-3">
+            {% if status_filter == 'in_progress' %}
+            รายการปัญหากำลังดำเนินการ
+            {% else %}
+            รายการปัญหาทั้งหมด
+            {% endif %}
+        </h3>
+
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>หัวข้อ</th>
+                    <th>รายละเอียด</th>
+                    <th>สถานะ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports.items %}
+                <tr>
+                    <td>{{ report.id }}</td>
+                    <td>{{ report.title }}</td>
+                    <td>{{ report.description }}</td>
+                    <td>{{ report.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- หน้า Pagination -->
+        <div class="pagination">
+            {% if reports.has_prev %}
+            <a href="{{ url_for('issues', page=reports.prev_num, status=status_filter) }}">&laquo; Previous</a>
+            {% endif %}
+            
+            <span>Page {{ reports.page }} of {{ reports.pages }}</span>
+            
+            {% if reports.has_next %}
+            <a href="{{ url_for('issues', page=reports.next_num, status=status_filter) }}">Next &raquo;</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
