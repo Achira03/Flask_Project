@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- ส่วนหัวของหน้า -->
+    <div class="p-3 mb-4 text-center text-white rounded-3 shadow-lg" style="background-color: #007bff;">
+        <h2>🏠 Admin Dashboard</h2>
+    </div>
+
+    <!-- การจัดการผู้ใช้ -->
+    <div class="card shadow-sm border-0 mb-5 rounded-4">
+        <div class="card-header bg-primary text-white text-center rounded-4">
+            <h3 class="font-weight-bold">จัดการผู้ใช้</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>เปลี่ยน Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="table-light">
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>
+                            <span class="badge bg-info text-white">{{ user.role }}</span>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('change_role', user_id=user.id) }}" method="post">
+                                <select class="form-select form-control-lg" name="role" aria-label="Select Role">
+                                    <option value="user" {% if user.role == 'user' %}selected{% endif %}>User</option>
+                                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                                </select>
+                                <button class="btn btn-outline-success mt-3 w-100 shadow-md transition-all hover:bg-green-200" type="submit">
+                                    <i class="fas fa-user-edit"></i> เปลี่ยน Role
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Card for Report Management -->
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-success text-white text-center rounded-4">
+            <h3 class="font-weight-bold">จัดการปัญหา</h3>
+        </div>
+        <div class="card-body">
+            <!-- ฟอร์มกรองหมวดหมู่และสถานะ -->
+            <div class="mb-4">
+                <form action="{{ url_for('admin_dashboard') }}" method="GET">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <select class="form-select" name="category" aria-label="เลือกหมวดหมู่">
+                                <option value="">เลือกหมวดหมู่</option>
+                                <option value="building" {% if request.args.get('category') == 'building' %}selected{% endif %}>ปัญหาด้านอาคารสถานที่</option>
+                                <option value="it" {% if request.args.get('category') == 'it' %}selected{% endif %}>ปัญหาด้านระบบไอทีและอินเทอร์เน็ต</option>
+                                <option value="admin" {% if request.args.get('category') == 'admin' %}selected{% endif %}>ปัญหาด้านเอกสารและงานธุรการ</option>
+                                <option value="welfare" {% if request.args.get('category') == 'welfare' %}selected{% endif %}>ปัญหาด้านกิจกรรมและสวัสดิการนักศึกษา</option>
+                                <option value="safety" {% if request.args.get('category') == 'safety' %}selected{% endif %}>ปัญหาด้านความปลอดภัย</option>
+                                <option value="other" {% if request.args.get('category') == 'other' %}selected{% endif %}>ปัญหาทั่วไปอื่นๆ</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <select class="form-select" name="status" aria-label="เลือกสถานะ">
+                                <option value="">เลือกสถานะ</option>
+                                <option value="รอดำเนินการ" {% if request.args.get('status') == 'รอดำเนินการ' %}selected{% endif %}>รอดำเนินการ</option>
+                                <option value="กำลังดำเนินการ" {% if request.args.get('status') == 'กำลังดำเนินการ' %}selected{% endif %}>กำลังดำเนินการ</option>
+                                <option value="เสร็จสิ้น" {% if request.args.get('status') == 'เสร็จสิ้น' %}selected{% endif %}>เสร็จสิ้น</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">กรองปัญหา</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ตารางแสดงปัญหาตามหมวดหมู่และสถานะ -->
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>หัวข้อ</th>
+                        <th>หมวดหมู่</th>
+                        <th>สถานะ</th>
+                        <th>เปลี่ยนสถานะ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr class="table-light">
+                        <td>{{ report.id }}</td>
+                        <td>{{ report.title }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ report.category }}</span>
+                        </td>
+                        <td>
+                            {% if report.status.name == 'รอดำเนินการ' %}
+                            <span class="badge bg-primary text-dark px-3 py-2 rounded-pill">รอดำเนินการ</span>
+                            {% elif report.status.name == 'กำลังดำเนินการ' %}
+                            <span class="badge bg-warning text-white px-3 py-2 rounded-pill">กำลังดำเนินการ</span>
+                            {% else %}
+                            <span class="badge bg-success text-white px-3 py-2 rounded-pill">เสร็จสิ้น</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form action="{{ url_for('update_report_status', report_id=report.id) }}" method="post">
+                                <select class="form-select form-control-lg" name="status" aria-label="Select Status">
+                                    <option value="รอดำเนินการ" {% if report.status == 'รอดำเนินการ' %}selected{% endif %}>รอดำเนินการ</option>
+                                    <option value="กำลังดำเนินการ" {% if report.status == 'กำลังดำเนินการ' %}selected{% endif %}>กำลังดำเนินการ</option>
+                                    <option value="เสร็จสิ้น" {% if report.status == 'เสร็จสิ้น' %}selected{% endif %}>เสร็จสิ้น</option>
+                                </select>
+                                <button class="btn btn-outline-info mt-3 w-100 shadow-md transition-all hover:bg-blue-200" type="submit">
+                                    <i class="fas fa-sync-alt"></i> อัปเดตสถานะ
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
