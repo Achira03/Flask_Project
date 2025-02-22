@@ -20,7 +20,7 @@ class Report(db.Model):
     category = db.Column(db.String(50))
     file = db.Column(db.String(200))
     contact = db.Column(db.String(100))
-    status_id = db.Column(db.Integer, db.ForeignKey('status.id', name='fk_report_status'), nullable=False)
+    status_id = db.Column(db.Integer, db.ForeignKey('status.id', name='fk_report_status'), nullable=False, default=1)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
