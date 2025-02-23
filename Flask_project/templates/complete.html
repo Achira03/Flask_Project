@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="p-3 mb-4 text-center text-white rounded-3 shadow-lg" style="background-color: #28a745;">
+        <h2>✅ ปัญหาที่เสร็จสิ้นแล้ว</h2>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>#</th>
+                <th>หัวข้อ</th>
+                <th>หมวดหมู่</th>
+                <th>สถานะ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr class="table-light">
+                <td>{{ report.id }}</td>
+                <td>{{ report.title }}</td>
+                <td><span class="badge bg-secondary">{{ report.category }}</span></td>
+                <td><span class="badge bg-success text-white px-3 py-2 rounded-pill">เสร็จสิ้น</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('issues') }}" class="btn btn-secondary mt-3">🔙 กลับไปหน้าปัญหาทั้งหมด</a>
+</div>
+{% endblock %}
