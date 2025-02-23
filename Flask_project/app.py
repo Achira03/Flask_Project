@@ -8,7 +8,7 @@ from models import db, User, Report, Status
 from werkzeug.security import check_password_hash, generate_password_hash
 from utils import admin_required, moderator_required
 from werkzeug.utils import secure_filename
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import joinedload
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
@@ -109,10 +109,25 @@ def logout():
 @login_required
 def dashboard():
     if current_user.role == 'admin':  # ถ้าเป็นแอดมินให้เห็นทุกปัญหา
-        reports = Report.query.all()
+        reports = Report.query.options(joinedload(Report.status)).all()  # ใช้ joinedload เพื่อโหลด status
     else:
-        reports = Report.query.filter_by(user_id=current_user.id).all()  # ดึงเฉพาะของผู้ใช้เอง
-    return render_template('dashboard.html', reports=reports)
+        reports = Report.query.filter_by(user_id=current_user.id).options(joinedload(Report.status)).all()  # ใช้ joinedload เพื่อโหลด status
+
+    # ดึงปัญหาที่แจ้งล่าสุด (เรียงตามวันที่)
+    recent_reports = Report.query.filter_by(user_id=current_user.id).options(joinedload(Report.status)) \
+                                .order_by(Report.created_at.desc()).limit(5).all()  # ใช้ joinedload เพื่อโหลด status
+
+    # นับจำนวนรายงานต่างๆ
+    total_reports = len(reports)
+    in_progress_reports = len([r for r in reports if r.status.name == 'กำลังดำเนินการ'])
+    completed_reports = len([r for r in reports if r.status.name == 'เสร็จสิ้น'])
+
+    return render_template('dashboard.html', 
+                           reports=reports, 
+                           recent_reports=recent_reports,
+                           total_reports=total_reports, 
+                           in_progress_reports=in_progress_reports,
+                           completed_reports=completed_reports)
 
 @app.route('/issues')
 def issues():
