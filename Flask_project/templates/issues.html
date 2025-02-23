@@ -11,14 +11,17 @@
         <h2>รายการปัญหาภายในคณะ</h2>
         
         <!-- ปุ่มกรองสถานะ "กำลังดำเนินการ" -->
-        <a href="{{ url_for('issues', status='in_progress') }}" class="btn btn-primary">กำลังดำเนินการ</a>
+        <a href="{{ url_for('issues', status='กำลังดำเนินการ') }}" class="btn btn-warning">กำลังดำเนินการ</a>
         
-        <!-- ปุ่มกรองสถานะทั้งหมด -->
-        <a href="{{ url_for('issues') }}" class="btn btn-secondary">ปัญหาทั้งหมด</a>
-
+        <!-- ปุ่มกรองสถานะ "เสร็จสิ้น" -->
+        <a href="{{ url_for('issues', status='เสร็จสิ้น') }}" class="btn btn-success">เสร็จสิ้น</a>
+        
+        <!-- ปุ่มกรองสถานะ "รอดำเนินการ" -->
+        <a href="{{ url_for('issues', status='รอดำเนินการ') }}" class="btn btn-primary">รอดำเนินการ</a>
+        
         <h3 class="mt-3">
-            {% if status_filter == 'in_progress' %}
-            รายการปัญหากำลังดำเนินการ
+            {% if status %}
+            รายการปัญหาสถานะ: {{ status }}
             {% else %}
             รายการปัญหาทั้งหมด
             {% endif %}
@@ -39,7 +42,21 @@
                     <td>{{ report.id }}</td>
                     <td>{{ report.title }}</td>
                     <td>{{ report.description }}</td>
-                    <td>{{ report.status }}</td>
+                    <td>
+                        <!-- แสดงสถานะ -->
+                        {% if report.status == 'กำลังดำเนินการ' %}
+                            <span class="badge badge-warning">กำลังดำเนินการ</span>
+                        {% elif report.status == 'เสร็จสิ้น' %}
+                            <span class="badge badge-success">เสร็จสิ้น</span>
+                        {% else %}
+                            <span class="badge badge-primary">รอดำเนินการ</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">ไม่มีปัญหาที่แสดงในสถานะนี้</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -48,13 +65,13 @@
         <!-- หน้า Pagination -->
         <div class="pagination">
             {% if reports.has_prev %}
-            <a href="{{ url_for('issues', page=reports.prev_num, status=status_filter) }}">&laquo; Previous</a>
+            <a href="{{ url_for('issues', page=reports.prev_num, status=status) }}">&laquo; Previous</a>
             {% endif %}
             
             <span>Page {{ reports.page }} of {{ reports.pages }}</span>
             
             {% if reports.has_next %}
-            <a href="{{ url_for('issues', page=reports.next_num, status=status_filter) }}">Next &raquo;</a>
+            <a href="{{ url_for('issues', page=reports.next_num, status=status) }}">Next &raquo;</a>
             {% endif %}
         </div>
     </div>
