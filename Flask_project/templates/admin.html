@@ -7,6 +7,12 @@
         <h2>🏠 Admin Dashboard</h2>
     </div>
 
+    <!-- ปุ่มกรองสถานะ -->
+    <div class="mb-4">
+        <a href="{{ url_for('issues', status='กำลังดำเนินการ') }}" class="btn btn-primary">กำลังดำเนินการ</a>
+        <a href="{{ url_for('issues') }}" class="btn btn-secondary">ปัญหาทั้งหมด</a>
+    </div>
+
     <!-- การจัดการผู้ใช้ -->
     <div class="card shadow-sm border-0 mb-5 rounded-4">
         <div class="card-header bg-primary text-white text-center rounded-4">
@@ -48,7 +54,7 @@
         </div>
     </div>
 
-    <!-- Card for Report Management -->
+    <!-- การจัดการปัญหา -->
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-header bg-success text-white text-center rounded-4">
             <h3 class="font-weight-bold">จัดการปัญหา</h3>
@@ -86,7 +92,7 @@
                 </form>
             </div>
 
-            <!-- ตารางแสดงปัญหาตามหมวดหมู่และสถานะ -->
+            <!-- ตารางแสดงปัญหา -->
             <table class="table table-bordered table-striped table-hover">
                 <thead class="thead-dark">
                     <tr>
@@ -117,9 +123,9 @@
                         <td>
                             <form action="{{ url_for('update_report_status', report_id=report.id) }}" method="post">
                                 <select class="form-select form-control-lg" name="status" aria-label="Select Status">
-                                    <option value="รอดำเนินการ" {% if report.status == 'รอดำเนินการ' %}selected{% endif %}>รอดำเนินการ</option>
-                                    <option value="กำลังดำเนินการ" {% if report.status == 'กำลังดำเนินการ' %}selected{% endif %}>กำลังดำเนินการ</option>
-                                    <option value="เสร็จสิ้น" {% if report.status == 'เสร็จสิ้น' %}selected{% endif %}>เสร็จสิ้น</option>
+                                    <option value="รอดำเนินการ" {% if report.status.name == 'รอดำเนินการ' %}selected{% endif %}>รอดำเนินการ</option>
+                                    <option value="กำลังดำเนินการ" {% if report.status.name == 'กำลังดำเนินการ' %}selected{% endif %}>กำลังดำเนินการ</option>
+                                    <option value="เสร็จสิ้น" {% if report.status.name == 'เสร็จสิ้น' %}selected{% endif %}>เสร็จสิ้น</option>
                                 </select>
                                 <button class="btn btn-outline-info mt-3 w-100 shadow-md transition-all hover:bg-blue-200" type="submit">
                                     <i class="fas fa-sync-alt"></i> อัปเดตสถานะ
