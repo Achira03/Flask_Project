@@ -10,6 +10,7 @@
         /* Navbar */
         .navbar {
             background: linear-gradient(90deg, #1565C0, #1976D2);
+            margin-bottom: 20px; /* เพิ่มระยะห่างจากเนื้อหาด้านล่าง */
         }
         .navbar-brand, .nav-link {
             color: white !important;
@@ -23,6 +24,8 @@
             padding-top: 20px;
             position: fixed;
             width: 240px;
+            top: 0;
+            bottom: 0;
         }
         .sidebar a {
             color: white;
@@ -39,10 +42,22 @@
 
         /* ปรับส่วนเนื้อหาให้ขยับ */
         .content {
-            margin-left: 240px;
+            margin-left: 240px; /* ทำให้เนื้อหาห่างจาก Sidebar */
             padding: 20px;
             background-color: #f5f5f5;
             min-height: 100vh;
+            margin-top: 20px; /* เพิ่มระยะห่างจาก Navbar */
+        }
+
+        /* ให้หัวข้อของ dashboard คงที่เมื่อเลื่อน */
+        .sticky-header {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #fff;
+            padding: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         /* Card Animation */
@@ -63,7 +78,6 @@
             background-color: #1e88e5;
             color: white;
         }
-
     </style>
 </head>
 <body>
@@ -98,7 +112,8 @@
 
     <!-- Main Content -->
     <div class="content">
-        <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
+        <!-- หัวข้อคงที่เมื่อเลื่อน -->
+        <h2 class="sticky-header"><i class="fas fa-chart-line"></i> Dashboard</h2>
 
         <!-- ปุ่มไปยังหน้าปัญหาทั้งหมด -->
         <a href="{{ url_for('issues') }}" class="btn btn-info mb-4">
@@ -160,15 +175,19 @@
                     <tbody>
                         {% for report in recent_reports %}
                         <tr>
-                            <td>{{ loop.index }}</td>
                             <td>{{ report.title }}</td>
+                            <td>{{ report.description }}</td>
                             <td>
-                                {% if report.status == 'pending' %}
-                                    <span class="badge bg-warning"><i class="fas fa-hourglass-half"></i> รอดำเนินการ</span>
-                                {% elif report.status == 'in_progress' %}
-                                    <span class="badge bg-primary"><i class="fas fa-spinner"></i> กำลังดำเนินการ</span>
+                                {% if report.status %}
+                                    {% if report.status.name == 'รอดำเนินการ' %}
+                                        <span class="badge bg-primary"><i class="fas fa-hourglass-half"></i> รอดำเนินการ</span>
+                                    {% elif report.status.name == 'กำลังดำเนินการ' %}
+                                        <span class="badge bg-warning"><i class="fas fa-spinner"></i> กำลังดำเนินการ</span>
+                                    {% elif report.status.name == 'เสร็จสิ้น' %}
+                                        <span class="badge bg-success"><i class="fas fa-check"></i> เสร็จสิ้น</span>
+                                    {% endif %}
                                 {% else %}
-                                    <span class="badge bg-success"><i class="fas fa-check"></i> เสร็จสิ้น</span>
+                                    <span class="badge bg-secondary">ไม่ระบุสถานะ</span>
                                 {% endif %}
                             </td>
                             <td>{{ report.created_at.strftime('%d/%m/%Y') }}</td>
