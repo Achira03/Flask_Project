@@ -8,6 +8,7 @@ from models import db, User, Report, Status
 from werkzeug.security import check_password_hash, generate_password_hash
 from utils import admin_required, moderator_required
 from werkzeug.utils import secure_filename
+from sqlalchemy.orm import aliased
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
@@ -114,22 +115,19 @@ def dashboard():
     return render_template('dashboard.html', reports=reports)
 
 @app.route('/issues')
-@login_required
 def issues():
-    status_filter = request.args.get('status')  # รับสถานะจาก query string
-    page = request.args.get('page', 1, type=int)
-    
-    if status_filter == 'in_progress':
-        reports = Report.query.filter(Report.status=='กำลังดำเนินการ').paginate(page=page, per_page=10, error_out=False)
+    status = request.args.get('status', None)  # ดึงค่า status จาก URL
+    page = request.args.get('page', 1, type=int)  # กำหนดหน้าปัจจุบัน
+    if status:
+        reports = Report.query.filter_by(status=status).paginate(page=page, per_page=10)  # แก้ไขการใช้ paginate()
     else:
-        reports = Report.query.paginate(page=page, per_page=10, error_out=False)
-    
-    return render_template('issues.html', reports=reports, status_filter=status_filter)
+        reports = Report.query.paginate(page=page, per_page=10)  # แก้ไขการใช้ paginate()
+
+    return render_template('issues.html', reports=reports, status=status)
 
 @app.route('/issues/status/<status>')
 def issues_by_status(status):
-    # Query to get reports filtered by status
-    reports = Report.query.filter_by(status=status).all()
+    reports = Report.query.filter(Report.status == status).all()
     return render_template('issues.html', reports=reports, status=status)
 
 @app.route('/admin', methods=['GET', 'POST'])
