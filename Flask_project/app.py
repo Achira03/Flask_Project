@@ -116,19 +116,45 @@ def dashboard():
 
 @app.route('/issues')
 def issues():
-    status = request.args.get('status', None)  # ดึงค่า status จาก URL
-    page = request.args.get('page', 1, type=int)  # กำหนดหน้าปัจจุบัน
-    if status:
-        reports = Report.query.filter_by(status=status).paginate(page=page, per_page=10)  # แก้ไขการใช้ paginate()
+    # รับค่าจาก query string 'status', 'category', และ 'page'
+    status_filter = request.args.get('status')
+    category_filter = request.args.get('category')
+    page = request.args.get('page', 1, type=int)  # กำหนดค่าเริ่มต้นเป็น 1 ถ้าไม่มีการระบุหน้า
+
+    # ค้นหาสถานะที่ตรงกับค่าที่รับมา
+    if status_filter:
+        status = Status.query.filter_by(name=status_filter).first()
+        if status:
+            reports = Report.query.filter_by(status=status).paginate(page=page, per_page=10)
+        else:
+            reports = Report.query.paginate(page=page, per_page=10)
     else:
-        reports = Report.query.paginate(page=page, per_page=10)  # แก้ไขการใช้ paginate()
+        reports = Report.query.paginate(page=page, per_page=10)
 
-    return render_template('issues.html', reports=reports, status=status)
+    # ถ้ามีการกรองหมวดหมู่
+    if category_filter:
+        reports = reports.filter_by(category=category_filter).paginate(page=page, per_page=10)
 
+    return render_template('issues.html', reports=reports)
+
+    return render_template('issues.html', reports=reports)
 @app.route('/issues/status/<status>')
 def issues_by_status(status):
     reports = Report.query.filter(Report.status == status).all()
     return render_template('issues.html', reports=reports, status=status)
+
+@app.route('/issues/in-progress')
+@login_required
+def issues_in_progress():
+    reports = Report.query.filter_by(status="กำลังดำเนินการ").all()
+    return render_template('in_progress.html', reports=reports)
+
+@app.route('/issues/completed')
+@login_required
+def issues_completed():
+    reports = Report.query.filter_by(status="เสร็จสิ้น").all()
+    return render_template('completed.html', reports=reports)
+
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required  # ต้องล็อกอินก่อนเข้า
