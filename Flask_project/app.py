@@ -96,7 +96,7 @@ def report():
         db.session.add(new_report)
         db.session.commit()
         flash('ส่งเรื่องเรียบร้อยแล้ว!', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('dashboard'))
     return render_template('report.html', form=form)
 
 @app.route('/logout')
@@ -137,7 +137,6 @@ def issues():
 
     return render_template('issues.html', reports=reports)
 
-    return render_template('issues.html', reports=reports)
 @app.route('/issues/status/<status>')
 def issues_by_status(status):
     reports = Report.query.filter(Report.status == status).all()
