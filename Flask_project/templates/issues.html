@@ -1,83 +1,71 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายการปัญหา</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-    <div class="container mt-5">
-        <h2>รายการปัญหาภายในคณะ</h2>
-        
-        <!-- ปุ่มกรองสถานะ "กำลังดำเนินการ" -->
-        <a href="{{ url_for('issues', status='กำลังดำเนินการ') }}" class="btn btn-warning">กำลังดำเนินการ</a>
-        
-        <!-- ปุ่มกรองสถานะ "เสร็จสิ้น" -->
-        <a href="{{ url_for('issues', status='เสร็จสิ้น') }}" class="btn btn-success">เสร็จสิ้น</a>
-        
-        <!-- ปุ่มกรองสถานะ "รอดำเนินการ" -->
-        <a href="{{ url_for('issues', status='รอดำเนินการ') }}" class="btn btn-primary">รอดำเนินการ</a>
-        
-        <h3 class="mt-3">
-            {% if status %}
-            รายการปัญหาสถานะ: {{ status }}
-            {% else %}
-            รายการปัญหาทั้งหมด
-            {% endif %}
-        </h3>
+{% extends "base.html" %}
 
-        <table class="table table-bordered mt-3">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>หัวข้อ</th>
-                    <th>รายละเอียด</th>
-                    <th>สถานะ</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for report in reports.items %}
-                <tr>
-                    <td>{{ report.id }}</td>
-                    <td>{{ report.title }}</td>
-                    <td>{{ report.description }}</td>
-                    <td>
-                        <!-- แสดงสถานะ -->
-                        {% if report.status == 'กำลังดำเนินการ' %}
-                            <span class="badge badge-warning">กำลังดำเนินการ</span>
-                        {% elif report.status == 'เสร็จสิ้น' %}
-                            <span class="badge badge-success">เสร็จสิ้น</span>
-                        {% else %}
-                            <span class="badge badge-primary">รอดำเนินการ</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="4">ไม่มีปัญหาที่แสดงในสถานะนี้</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <!-- หน้า Pagination -->
-        <div class="pagination">
-            {% if reports.has_prev %}
-            <a href="{{ url_for('issues', page=reports.prev_num, status=status) }}">&laquo; Previous</a>
-            {% endif %}
-            
-            <span>Page {{ reports.page }} of {{ reports.pages }}</span>
-            
-            {% if reports.has_next %}
-            <a href="{{ url_for('issues', page=reports.next_num, status=status) }}">Next &raquo;</a>
-            {% endif %}
-        </div>
+{% block content %}
+<div class="container mt-4">
+    <div class="p-3 mb-4 text-center text-white rounded-3 shadow-lg" style="background-color: #007bff;">
+        <h2>📋 ปัญหาทั้งหมด</h2>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+    <!-- ฟอร์มกรองปัญหา -->
+    <div class="mb-4">
+        <form action="{{ url_for('issues') }}" method="GET">
+            <div class="row">
+                <div class="col-md-4">
+                    <select class="form-select" name="category" aria-label="เลือกหมวดหมู่">
+                        <option value="">เลือกหมวดหมู่</option>
+                        <option value="building" {% if request.args.get('category') == 'building' %}selected{% endif %}>ปัญหาด้านอาคารสถานที่</option>
+                        <option value="it" {% if request.args.get('category') == 'it' %}selected{% endif %}>ปัญหาด้านระบบไอทีและอินเทอร์เน็ต</option>
+                        <option value="admin" {% if request.args.get('category') == 'admin' %}selected{% endif %}>ปัญหาด้านเอกสารและงานธุรการ</option>
+                        <option value="welfare" {% if request.args.get('category') == 'welfare' %}selected{% endif %}>ปัญหาด้านกิจกรรมและสวัสดิการนักศึกษา</option>
+                        <option value="safety" {% if request.args.get('category') == 'safety' %}selected{% endif %}>ปัญหาด้านความปลอดภัย</option>
+                        <option value="other" {% if request.args.get('category') == 'other' %}selected{% endif %}>ปัญหาทั่วไปอื่นๆ</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" name="status" aria-label="เลือกสถานะ">
+                        <option value="">เลือกสถานะ</option>
+                        <option value="รอดำเนินการ" {% if request.args.get('status') == 'รอดำเนินการ' %}selected{% endif %}>รอดำเนินการ</option>
+                        <option value="กำลังดำเนินการ" {% if request.args.get('status') == 'กำลังดำเนินการ' %}selected{% endif %}>กำลังดำเนินการ</option>
+                        <option value="เสร็จสิ้น" {% if request.args.get('status') == 'เสร็จสิ้น' %}selected{% endif %}>เสร็จสิ้น</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">กรองปัญหา</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- ตารางแสดงปัญหา -->
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>#</th>
+                <th>หัวข้อ</th>
+                <th>หมวดหมู่</th>
+                <th>สถานะ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr class="table-light">
+                <td>{{ report.id }}</td>
+                <td>{{ report.title }}</td>
+                <td>
+                    <span class="badge bg-secondary">{{ report.category }}</span>
+                </td>
+                <td>
+                    {% if report.status.name == 'รอดำเนินการ' %}
+                    <span class="badge bg-primary text-dark px-3 py-2 rounded-pill">รอดำเนินการ</span>
+                    {% elif report.status.name == 'กำลังดำเนินการ' %}
+                    <span class="badge bg-warning text-white px-3 py-2 rounded-pill">กำลังดำเนินการ</span>
+                    {% else %}
+                    <span class="badge bg-success text-white px-3 py-2 rounded-pill">เสร็จสิ้น</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
