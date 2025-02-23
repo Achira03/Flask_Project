@@ -116,7 +116,7 @@
                             <span class="badge bg-primary text-dark px-3 py-2 rounded-pill">รอดำเนินการ</span>
                             {% elif report.status.name == 'กำลังดำเนินการ' %}
                             <span class="badge bg-warning text-white px-3 py-2 rounded-pill">กำลังดำเนินการ</span>
-                            {% else %}
+                            {% elif report.status.name == 'เสร็จสิ้น' %}
                             <span class="badge bg-success text-white px-3 py-2 rounded-pill">เสร็จสิ้น</span>
                             {% endif %}
                         </td>
